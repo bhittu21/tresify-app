@@ -54,6 +54,22 @@ function readBody(req) {
   });
 }
 
+function publicClient(client) {
+  return {
+    id: client.id,
+    clientName: client.clientName,
+    serviceType: client.serviceType,
+    auditDate: client.auditDate,
+    createdAt: client.createdAt,
+    hasReport: Boolean(client.reportHTML && client.reportHTML.length > 20)
+  };
+}
+
+function privateClient(client) {
+  const { password, ...safeClient } = client;
+  return safeClient;
+}
+
 async function serveStatic(req, res) {
   const url = new URL(req.url, `http://${req.headers.host || 'localhost'}`);
   let pathname = decodeURIComponent(url.pathname);
@@ -104,6 +120,33 @@ const server = http.createServer(async (req, res) => {
       }
 
       sendJson(res, 405, { error: 'Method not allowed' });
+      return;
+    }
+
+    if (req.url && req.url.startsWith('/api/reports')) {
+      if (req.method !== 'GET') {
+        sendJson(res, 405, { error: 'Method not allowed' });
+        return;
+      }
+      const data = JSON.parse(await fs.readFile(dataFile, 'utf8') || '{"clients":[]}');
+      sendJson(res, 200, { clients: (data.clients || []).map(publicClient) });
+      return;
+    }
+
+    if (req.url && req.url.startsWith('/api/report')) {
+      if (req.method !== 'POST') {
+        sendJson(res, 405, { error: 'Method not allowed' });
+        return;
+      }
+      const body = await readBody(req);
+      const { id, password } = JSON.parse(body || '{}');
+      const data = JSON.parse(await fs.readFile(dataFile, 'utf8') || '{"clients":[]}');
+      const client = (data.clients || []).find(item => item.id === id);
+      if (!client || client.password !== password) {
+        sendJson(res, 403, { error: 'Invalid report password' });
+        return;
+      }
+      sendJson(res, 200, { client: privateClient(client) });
       return;
     }
 

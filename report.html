@@ -323,12 +323,11 @@ async function loadData() {
   sharedData = readLocalData();
   if (location.protocol === 'file:') return;
   try {
-    const res = await fetch('api/data', { cache: 'no-store' });
+    const res = await fetch('api/reports', { cache: 'no-store' });
     if (!res.ok) throw new Error('Shared data unavailable');
     const data = await res.json();
     if (!Array.isArray(data.clients)) throw new Error('Invalid shared data');
     sharedData = data;
-    try { localStorage.setItem('tresify_data', JSON.stringify(data)); } catch(e) {}
   } catch(e) {}
 }
 
@@ -357,7 +356,10 @@ if (!clientId) {
     document.title = 'Not found — Tresify Lab';
   } else {
     const isAuthed = sessionStorage.getItem('tresify_auth_' + clientId) === '1';
-    if (!isAuthed) {
+    const savedReport = getSessionReport(clientId);
+    if (isAuthed && savedReport) {
+      showReport(savedReport);
+    } else if (!isAuthed || !client.reportHTML) {
       showPasswordGate(client);
     } else {
       showReport(client);
@@ -367,6 +369,15 @@ if (!clientId) {
 }
 
 loadData().then(initReport);
+
+function getSessionReport(id) {
+  try {
+    const data = JSON.parse(sessionStorage.getItem('tresify_report_' + id) || 'null');
+    return data && data.id === id && data.reportHTML ? data : null;
+  } catch(e) {
+    return null;
+  }
+}
 
 function showPasswordGate(client) {
   document.title = `${client.clientName} Report — Tresify Lab`;
@@ -394,15 +405,32 @@ function showPasswordGate(client) {
       </div>
     </div>`;
 
-  const check = () => {
+  const check = async () => {
     const val = document.getElementById('pw').value.trim();
     if (val === client.password) {
       sessionStorage.setItem('tresify_auth_' + client.id, '1');
       showReport(client);
-    } else {
-      document.getElementById('pw-err').textContent = 'Incorrect password. Please try again.';
-      document.getElementById('pw').focus();
+      return;
     }
+
+    if (!client.password && location.protocol !== 'file:') {
+      try {
+        const res = await fetch('api/report', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ id: client.id, password: val })
+        });
+        if (!res.ok) throw new Error('Invalid password');
+        const data = await res.json();
+        sessionStorage.setItem('tresify_auth_' + client.id, '1');
+        sessionStorage.setItem('tresify_report_' + client.id, JSON.stringify(data.client));
+        showReport(data.client);
+        return;
+      } catch(e) {}
+    }
+
+    document.getElementById('pw-err').textContent = 'Incorrect password. Please try again.';
+    document.getElementById('pw').focus();
   };
 
   document.getElementById('pw-btn').addEventListener('click', check);

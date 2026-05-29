@@ -579,16 +579,31 @@ function readLocalData() {
   catch { return { clients: [] }; }
 }
 
+function mergeData(remote, local) {
+  const clientsById = new Map();
+  (remote.clients || []).forEach(client => clientsById.set(client.id, client));
+  (local.clients || []).forEach(client => clientsById.set(client.id, client));
+  return { clients: Array.from(clientsById.values()) };
+}
+
 async function loadData() {
-  sharedData = readLocalData();
+  const localData = readLocalData();
+  sharedData = localData;
   if (location.protocol === 'file:') return;
   try {
     const res = await fetch('api/data', { cache: 'no-store' });
     if (!res.ok) throw new Error('Shared data unavailable');
-    const data = await res.json();
-    if (!Array.isArray(data.clients)) throw new Error('Invalid shared data');
-    sharedData = data;
-    try { localStorage.setItem('tresify_data', JSON.stringify(data)); } catch(e) {}
+    const remoteData = await res.json();
+    if (!Array.isArray(remoteData.clients)) throw new Error('Invalid shared data');
+    sharedData = mergeData(remoteData, localData);
+    try { localStorage.setItem('tresify_data', JSON.stringify(sharedData)); } catch(e) {}
+    if (JSON.stringify(sharedData) !== JSON.stringify(remoteData)) {
+      await fetch('api/data', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(sharedData)
+      });
+    }
   } catch(e) {}
 }
 
@@ -596,17 +611,22 @@ function getData() {
   return sharedData;
 }
 
-function saveData(data) {
+async function saveData(data) {
   sharedData = data;
   try { localStorage.setItem('tresify_data', JSON.stringify(data)); } catch(e) {}
-  if (location.protocol === 'file:') return;
-  fetch('api/data', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(data)
-  }).catch(() => {
+  if (location.protocol === 'file:') return false;
+  try {
+    const res = await fetch('api/data', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data)
+    });
+    if (!res.ok) throw new Error('Shared save failed');
+    return true;
+  } catch(e) {
     showToast('Saved in this browser only. Start the shared server to publish to other browsers.', 4500);
-  });
+    return false;
+  }
 }
 
 function escHtml(s) {
@@ -1057,7 +1077,7 @@ function readFile(file) {
   reader.readAsText(file);
 }
 
-window.saveClient = function() {
+window.saveClient = async function() {
   const name = (document.getElementById('m-name').value || '').trim();
   const service = (document.getElementById('m-service').value || '').trim();
   const pw = (document.getElementById('m-pw').value || '').trim();
@@ -1083,10 +1103,10 @@ window.saveClient = function() {
         reportHTML: currentUploadContent || data.clients[idx].reportHTML || ''
       };
     }
-    saveData(data);
+    const shared = await saveData(data);
     closeModal();
     renderReportsTab();
-    showToast('Report updated.');
+    showToast(shared ? 'Report updated and published.' : 'Report updated.');
   } else {
     const newClient = {
       id: genId(),
@@ -1099,10 +1119,10 @@ window.saveClient = function() {
     };
     if (!data.clients) data.clients = [];
     data.clients.push(newClient);
-    saveData(data);
+    const shared = await saveData(data);
     closeModal();
     renderReportsTab();
-    showToast('Report added successfully.');
+    showToast(shared ? 'Report added and published.' : 'Report added successfully.');
   }
 };
 
@@ -1118,10 +1138,10 @@ window.openDeleteConfirm = function(id, name) {
   overlay.classList.add('open');
 };
 
-window.deleteClient = function(id) {
+window.deleteClient = async function(id) {
   const data = getData();
   data.clients = (data.clients||[]).filter(c => c.id !== id);
-  saveData(data);
+  await saveData(data);
   closeConfirm();
   renderReportsTab();
   showToast('Report deleted.');
@@ -1141,6 +1161,7 @@ function confirmClearAll() {
 
 window.clearAll = function() {
   localStorage.removeItem('tresify_data');
+  saveData({ clients: [] });
   closeConfirm();
   renderReportsTab();
   showToast('All data cleared.');
@@ -1186,7 +1207,7 @@ window.importData = function(e) {
   const file = e.target.files[0];
   if (!file) return;
   const reader = new FileReader();
-  reader.onload = ev => {
+  reader.onload = async ev => {
     try {
       const imported = JSON.parse(ev.target.result);
       if (!imported.clients || !Array.isArray(imported.clients)) throw new Error('Invalid format');
@@ -1199,7 +1220,7 @@ window.importData = function(e) {
           added++;
         }
       });
-      saveData(existing);
+      await saveData(existing);
       document.getElementById('import-msg').style.color = 'var(--green)';
       document.getElementById('import-msg').textContent = `✓ Imported ${added} new record(s). ${imported.clients.length - added} duplicate(s) skipped.`;
       if (document.getElementById('clients-tbody')) renderReportsTab();

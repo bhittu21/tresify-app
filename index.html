@@ -501,12 +501,11 @@ async function loadData() {
   sharedData = readLocalData();
   if (location.protocol === 'file:') return;
   try {
-    const res = await fetch('api/data', { cache: 'no-store' });
+    const res = await fetch('api/reports', { cache: 'no-store' });
     if (!res.ok) throw new Error('Shared data unavailable');
     const data = await res.json();
     if (!Array.isArray(data.clients)) throw new Error('Invalid shared data');
     sharedData = data;
-    try { localStorage.setItem('tresify_data', JSON.stringify(data)); } catch(e) {}
   } catch(e) {}
 }
 
@@ -605,15 +604,38 @@ document.getElementById('modal-overlay').addEventListener('click', e => {
   if (e.target === document.getElementById('modal-overlay')) closeModal();
 });
 
-document.getElementById('modal-confirm').addEventListener('click', () => {
+document.getElementById('modal-confirm').addEventListener('click', async () => {
   const entered = document.getElementById('pw-input').value.trim();
   if (!activeClient) return;
-  if (entered === activeClient.password) {
+
+  if (activeClient.password && entered === activeClient.password) {
     sessionStorage.setItem('tresify_auth_' + activeClient.id, '1');
     window.location.href = 'report.html?id=' + encodeURIComponent(activeClient.id);
-  } else {
+    return;
+  }
+
+  if (!activeClient.password && location.protocol !== 'file:') {
+    try {
+      const res = await fetch('api/report', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id: activeClient.id, password: entered })
+      });
+      if (!res.ok) throw new Error('Invalid password');
+      const data = await res.json();
+      sessionStorage.setItem('tresify_auth_' + activeClient.id, '1');
+      sessionStorage.setItem('tresify_report_' + activeClient.id, JSON.stringify(data.client));
+      window.location.href = 'report.html?id=' + encodeURIComponent(activeClient.id);
+      return;
+    } catch(e) {}
+  }
+
+  if (!activeClient.password || entered !== activeClient.password) {
     document.getElementById('modal-error').textContent = 'Incorrect password. Please try again.';
     document.getElementById('pw-input').focus();
+  } else {
+    sessionStorage.setItem('tresify_auth_' + activeClient.id, '1');
+    window.location.href = 'report.html?id=' + encodeURIComponent(activeClient.id);
   }
 });
 
