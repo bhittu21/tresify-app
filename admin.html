@@ -1,0 +1,1238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<title>Admin — Tresify Lab</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500&family=DM+Serif+Display&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --ink: #0f0f0f;
+    --ink2: #555;
+    --ink3: #999;
+    --surface: #fafaf8;
+    --card: #ffffff;
+    --border: #e8e8e4;
+    --green: #0f6e56;
+    --green-bg: #e1f5ee;
+    --red: #a32d2d;
+    --red-bg: #fcebeb;
+    --blue: #185fa5;
+    --blue-bg: #e6f1fb;
+  }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--surface);
+    color: var(--ink);
+    min-height: 100vh;
+  }
+
+  .login-wrap {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+  }
+
+  .login-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 40px;
+    width: 100%;
+    max-width: 360px;
+  }
+
+  .logo-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 28px;
+  }
+
+  .logo-mark {
+    width: 30px;
+    height: 30px;
+    background: var(--ink);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .logo-mark svg { width: 17px; height: 17px; }
+
+  .logo-text {
+    font-family: 'DM Serif Display', serif;
+    font-size: 16px;
+    color: var(--ink);
+  }
+
+  .login-card h1 { font-size: 20px; font-weight: 500; margin-bottom: 6px; }
+  .login-card p { font-size: 14px; color: var(--ink2); margin-bottom: 24px; }
+
+  label.field-label {
+    display: block;
+    font-size: 11px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--ink2);
+    margin-bottom: 7px;
+  }
+
+  input[type=text], input[type=password], input[type=date], select, textarea {
+    width: 100%;
+    padding: 11px 13px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    color: var(--ink);
+    background: var(--surface);
+    outline: none;
+    transition: border-color 0.15s;
+    appearance: none;
+  }
+
+  input:focus, select:focus, textarea:focus { border-color: var(--ink); }
+
+  .field { margin-bottom: 16px; }
+
+  .err-msg {
+    font-size: 13px;
+    color: var(--red);
+    margin-top: 8px;
+    min-height: 18px;
+  }
+
+  .btn-primary {
+    width: 100%;
+    padding: 12px;
+    background: var(--ink);
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+
+  .btn-primary:hover { background: #333; }
+
+  .admin-layout { display: flex; min-height: 100vh; }
+
+  .sidebar-nav {
+    width: 220px;
+    flex-shrink: 0;
+    background: var(--card);
+    border-right: 1px solid var(--border);
+    padding: 24px 0;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .nav-logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 0 20px;
+    margin-bottom: 28px;
+    text-decoration: none;
+  }
+
+  .nav-logo-text { font-family: 'DM Serif Display', serif; font-size: 15px; color: var(--ink); }
+  .nav-logo-sub { font-size: 10px; color: var(--ink3); letter-spacing: 0.5px; text-transform: uppercase; }
+
+  .nav-section {
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--ink3);
+    padding: 0 20px;
+    margin-bottom: 8px;
+    margin-top: 4px;
+  }
+
+  .nav-item {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    padding: 9px 20px;
+    font-size: 13px;
+    color: var(--ink2);
+    text-decoration: none;
+    cursor: pointer;
+    transition: color 0.12s, background 0.12s;
+    border: none;
+    background: none;
+    width: 100%;
+    text-align: left;
+    font-family: 'DM Sans', sans-serif;
+  }
+
+  .nav-item:hover { color: var(--ink); background: var(--surface); }
+  .nav-item.active { color: var(--ink); background: var(--surface); font-weight: 500; }
+  .nav-item svg { width: 16px; height: 16px; flex-shrink: 0; }
+
+  .nav-bottom { margin-top: auto; padding-top: 16px; border-top: 1px solid var(--border); }
+
+  .admin-main { flex: 1; overflow-y: auto; }
+
+  .main-header {
+    padding: 32px 32px 24px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 16px;
+  }
+
+  .main-header h1 { font-size: 22px; font-weight: 500; letter-spacing: -0.3px; }
+  .main-header p { font-size: 14px; color: var(--ink2); margin-top: 4px; }
+
+  .header-actions { display: flex; gap: 8px; flex-shrink: 0; }
+
+  .btn-sm {
+    height: 34px;
+    padding: 0 14px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: transparent;
+    cursor: pointer;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    color: var(--ink2);
+    transition: background 0.15s;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .btn-sm:hover { background: var(--border); }
+
+  .btn-sm.dark {
+    background: var(--ink);
+    color: #fff;
+    border-color: var(--ink);
+  }
+
+  .btn-sm.dark:hover { background: #333; }
+
+  .btn-sm svg { width: 14px; height: 14px; }
+
+  .content-body { padding: 28px 32px; }
+
+  .stats-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 12px;
+    margin-bottom: 28px;
+  }
+
+  .stat-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 18px 20px;
+  }
+
+  .stat-label { font-size: 12px; color: var(--ink3); margin-bottom: 8px; }
+  .stat-value { font-size: 26px; font-weight: 500; letter-spacing: -0.5px; }
+
+  .table-wrap {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+  }
+
+  .table-search {
+    padding: 14px 20px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .table-search svg { width: 15px; height: 15px; stroke: var(--ink3); flex-shrink: 0; }
+  .table-search input {
+    border: none;
+    background: transparent;
+    font-size: 13px;
+    color: var(--ink);
+    outline: none;
+    flex: 1;
+    padding: 0;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+  }
+
+  thead tr { border-bottom: 1px solid var(--border); }
+
+  th {
+    text-align: left;
+    padding: 10px 20px;
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    color: var(--ink3);
+  }
+
+  td {
+    padding: 14px 20px;
+    border-bottom: 1px solid #f3f3f0;
+    vertical-align: middle;
+    color: var(--ink);
+  }
+
+  tr:last-child td { border-bottom: none; }
+  tr:hover td { background: #fafaf8; }
+
+  .client-cell { display: flex; align-items: center; gap: 10px; }
+
+  .client-avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: 500;
+    flex-shrink: 0;
+  }
+
+  .client-name { font-weight: 500; }
+  .client-id { font-size: 11px; color: var(--ink3); }
+
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 500;
+  }
+
+  .pw-cell {
+    font-family: 'DM Sans', monospace;
+    font-size: 13px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .pw-text { letter-spacing: 0.3px; }
+  .pw-copy {
+    width: 22px;
+    height: 22px;
+    border: 1px solid var(--border);
+    border-radius: 5px;
+    background: transparent;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.12s;
+  }
+
+  .pw-copy:hover { background: var(--surface); }
+  .pw-copy svg { width: 11px; height: 11px; stroke: var(--ink2); }
+
+  .action-cell { display: flex; align-items: center; gap: 6px; }
+
+  .act-btn {
+    width: 28px;
+    height: 28px;
+    border: 1px solid var(--border);
+    border-radius: 7px;
+    background: transparent;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.12s, border-color 0.12s;
+  }
+
+  .act-btn:hover { background: var(--surface); }
+  .act-btn.danger:hover { background: var(--red-bg); border-color: #f0bbbb; }
+  .act-btn svg { width: 13px; height: 13px; stroke: var(--ink2); }
+  .act-btn.danger svg { stroke: var(--red); }
+
+  .view-link {
+    font-size: 12px;
+    color: var(--blue);
+    text-decoration: none;
+  }
+  .view-link:hover { text-decoration: underline; }
+
+  .empty-row td { text-align: center; color: var(--ink3); padding: 48px; }
+
+  .modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.4);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 100;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s;
+    padding: 1rem;
+  }
+
+  .modal-overlay.open { opacity: 1; pointer-events: all; }
+
+  .modal {
+    background: var(--card);
+    border-radius: 16px;
+    padding: 32px;
+    width: 100%;
+    max-width: 480px;
+    max-height: 90vh;
+    overflow-y: auto;
+    transform: translateY(8px);
+    transition: transform 0.2s;
+  }
+
+  .modal-overlay.open .modal { transform: translateY(0); }
+
+  .modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 24px;
+  }
+
+  .modal-header h2 { font-size: 18px; font-weight: 500; }
+
+  .modal-close {
+    width: 28px;
+    height: 28px;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--ink2);
+    font-size: 20px;
+    padding: 0;
+    line-height: 1;
+  }
+
+  .modal-close:hover { color: var(--ink); }
+
+  .upload-zone {
+    border: 1.5px dashed var(--border);
+    border-radius: 10px;
+    padding: 24px;
+    text-align: center;
+    cursor: pointer;
+    transition: border-color 0.15s, background 0.15s;
+    position: relative;
+  }
+
+  .upload-zone:hover, .upload-zone.drag { border-color: var(--ink); background: var(--surface); }
+  .upload-zone input[type=file] { position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%; }
+
+  .upload-icon { margin: 0 auto 10px; display: block; }
+  .upload-icon svg { width: 28px; height: 28px; stroke: var(--ink3); }
+  .upload-text { font-size: 13px; color: var(--ink2); }
+  .upload-hint { font-size: 12px; color: var(--ink3); margin-top: 4px; }
+  .upload-success { font-size: 13px; color: var(--green); margin-top: 8px; }
+
+  .pw-gen-row {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+  }
+
+  .pw-gen-row input { flex: 1; }
+
+  .pw-gen-btn {
+    height: 40px;
+    padding: 0 14px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: transparent;
+    cursor: pointer;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 12px;
+    color: var(--ink2);
+    white-space: nowrap;
+    transition: background 0.15s;
+  }
+
+  .pw-gen-btn:hover { background: var(--surface); }
+
+  .modal-actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 24px;
+  }
+
+  .modal-actions button { flex: 1; }
+
+  .btn-cancel {
+    padding: 12px;
+    background: transparent;
+    color: var(--ink2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+
+  .btn-cancel:hover { background: var(--surface); }
+
+  .toast {
+    position: fixed;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%) translateY(10px);
+    background: var(--ink);
+    color: #fff;
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-size: 13px;
+    opacity: 0;
+    transition: opacity 0.2s, transform 0.2s;
+    pointer-events: none;
+    z-index: 300;
+  }
+
+  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+  .confirm-modal {
+    background: var(--card);
+    border-radius: 16px;
+    padding: 28px 32px;
+    width: 100%;
+    max-width: 360px;
+    transform: translateY(8px);
+    transition: transform 0.2s;
+  }
+
+  .modal-overlay.open .confirm-modal { transform: translateY(0); }
+
+  .confirm-modal h2 { font-size: 17px; font-weight: 500; margin-bottom: 8px; }
+  .confirm-modal p { font-size: 14px; color: var(--ink2); line-height: 1.5; margin-bottom: 24px; }
+
+  .btn-danger {
+    padding: 12px;
+    background: var(--red);
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+
+  .btn-danger:hover { background: #8b1f1f; }
+
+  .data-section { margin-bottom: 28px; }
+  .data-section-title { font-size: 14px; font-weight: 500; margin-bottom: 12px; }
+  .data-info { font-size: 13px; color: var(--ink2); line-height: 1.6; margin-bottom: 16px; }
+  .data-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+
+  .color-0 { background: #e1f5ee; color: #0f6e56; }
+  .color-1 { background: #e6f1fb; color: #185fa5; }
+  .color-2 { background: #eeedfe; color: #534ab7; }
+  .color-3 { background: #faece7; color: #993c1d; }
+  .color-4 { background: #faeeda; color: #854f0b; }
+</style>
+</head>
+<body>
+
+<div id="app"></div>
+<div class="toast" id="toast"></div>
+
+<script>
+const ADMIN_PW = 'tresify2025';
+let sharedData = { clients: [] };
+
+function readLocalData() {
+  try { return JSON.parse(localStorage.getItem('tresify_data') || '{"clients":[]}'); }
+  catch { return { clients: [] }; }
+}
+
+async function loadData() {
+  sharedData = readLocalData();
+  if (location.protocol === 'file:') return;
+  try {
+    const res = await fetch('api/data', { cache: 'no-store' });
+    if (!res.ok) throw new Error('Shared data unavailable');
+    const data = await res.json();
+    if (!Array.isArray(data.clients)) throw new Error('Invalid shared data');
+    sharedData = data;
+    try { localStorage.setItem('tresify_data', JSON.stringify(data)); } catch(e) {}
+  } catch(e) {}
+}
+
+function getData() {
+  return sharedData;
+}
+
+function saveData(data) {
+  sharedData = data;
+  try { localStorage.setItem('tresify_data', JSON.stringify(data)); } catch(e) {}
+  if (location.protocol === 'file:') return;
+  fetch('api/data', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data)
+  }).catch(() => {
+    showToast('Saved in this browser only. Start the shared server to publish to other browsers.', 4500);
+  });
+}
+
+function escHtml(s) {
+  return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function showToast(msg, dur=2500) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), dur);
+}
+
+function genId() {
+  return Math.random().toString(36).slice(2,9) + Date.now().toString(36);
+}
+
+function genPassword() {
+  const chars = 'ABCDEFGHJKMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789';
+  let p = '';
+  for (let i = 0; i < 10; i++) p += chars[Math.floor(Math.random() * chars.length)];
+  return p;
+}
+
+const colorIdx = name => {
+  let h = 0;
+  for (let c of (name||'')) h = (h * 31 + c.charCodeAt(0)) & 0xffffffff;
+  return Math.abs(h) % 5;
+};
+
+const initials = name => String(name||'').trim().split(/\s+/).map(w=>w[0]&&w[0].toUpperCase()||'').slice(0,2).join('');
+
+function formatDateStr(iso) {
+  if (!iso) return '—';
+  const d = new Date(iso);
+  if (isNaN(d)) return iso;
+  const dd = String(d.getDate()).padStart(2,'0');
+  const mm = String(d.getMonth()+1).padStart(2,'0');
+  const yyyy = d.getFullYear();
+  return `${dd}/${mm}/${yyyy}`;
+}
+
+function toInputDate(ddmmyyyy) {
+  if (!ddmmyyyy) return '';
+  if (ddmmyyyy.includes('-')) return ddmmyyyy;
+  const [dd, mm, yyyy] = ddmmyyyy.split('/');
+  if (!dd||!mm||!yyyy) return '';
+  return `${yyyy}-${mm}-${dd}`;
+}
+
+function fromInputDate(yyyy_mm_dd) {
+  if (!yyyy_mm_dd) return '';
+  const [yyyy, mm, dd] = yyyy_mm_dd.split('-');
+  return `${dd}/${mm}/${yyyy}`;
+}
+
+const app = document.getElementById('app');
+const authed = sessionStorage.getItem('tresify_admin') === '1';
+
+loadData().then(() => {
+  if (!authed) {
+    renderLogin();
+  } else {
+    renderAdmin();
+  }
+});
+
+function renderLogin() {
+  app.innerHTML = `
+    <div class="login-wrap">
+      <div class="login-card">
+        <div class="logo-row">
+          <div class="logo-mark">
+            <svg viewBox="0 0 18 18" fill="none">
+              <rect x="2" y="2" width="6" height="6" rx="1.5" fill="white"/>
+              <rect x="10" y="2" width="6" height="6" rx="1.5" fill="white" opacity="0.6"/>
+              <rect x="2" y="10" width="6" height="6" rx="1.5" fill="white" opacity="0.6"/>
+              <rect x="10" y="10" width="6" height="6" rx="1.5" fill="white" opacity="0.3"/>
+            </svg>
+          </div>
+          <div>
+            <div class="logo-text">Tresify Lab</div>
+          </div>
+        </div>
+        <h1>Admin panel</h1>
+        <p>Enter your admin password to manage client reports.</p>
+        <div class="field">
+          <label class="field-label" for="admin-pw">Password</label>
+          <input type="password" id="admin-pw" placeholder="Admin password" autocomplete="off">
+          <div class="err-msg" id="login-err"></div>
+        </div>
+        <button class="btn-primary" id="login-btn">Sign in →</button>
+      </div>
+    </div>`;
+
+  const check = () => {
+    const v = document.getElementById('admin-pw').value;
+    if (v === ADMIN_PW) {
+      sessionStorage.setItem('tresify_admin', '1');
+      renderAdmin();
+    } else {
+      document.getElementById('login-err').textContent = 'Incorrect password.';
+      document.getElementById('admin-pw').focus();
+    }
+  };
+
+  document.getElementById('login-btn').addEventListener('click', check);
+  document.getElementById('admin-pw').addEventListener('keydown', e => { if (e.key === 'Enter') check(); });
+  setTimeout(() => document.getElementById('admin-pw') && document.getElementById('admin-pw').focus(), 80);
+}
+
+function renderAdmin() {
+  app.innerHTML = `
+    <div class="admin-layout">
+      <nav class="sidebar-nav">
+        <a class="nav-logo" href="index.html" target="_blank">
+          <div class="logo-mark">
+            <svg viewBox="0 0 18 18" fill="none">
+              <rect x="2" y="2" width="6" height="6" rx="1.5" fill="white"/>
+              <rect x="10" y="2" width="6" height="6" rx="1.5" fill="white" opacity="0.6"/>
+              <rect x="2" y="10" width="6" height="6" rx="1.5" fill="white" opacity="0.6"/>
+              <rect x="10" y="10" width="6" height="6" rx="1.5" fill="white" opacity="0.3"/>
+            </svg>
+          </div>
+          <div>
+            <div class="nav-logo-text">Tresify Lab</div>
+            <div class="nav-logo-sub">Admin</div>
+          </div>
+        </a>
+        <div class="nav-section">Manage</div>
+        <button class="nav-item active" id="nav-reports" onclick="switchTab('reports')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+          Reports
+        </button>
+        <button class="nav-item" id="nav-data" onclick="switchTab('data')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></svg>
+          Data & Backup
+        </button>
+        <div class="nav-bottom">
+          <button class="nav-item" onclick="logout()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+            Sign out
+          </button>
+        </div>
+      </nav>
+      <main class="admin-main" id="admin-main"></main>
+    </div>
+    <div class="modal-overlay" id="modal-overlay"><div class="modal" id="modal-inner"></div></div>
+    <div class="modal-overlay" id="confirm-overlay"><div class="confirm-modal" id="confirm-inner"></div></div>`;
+
+  switchTab('reports');
+}
+
+function switchTab(tab) {
+  document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+  document.getElementById('nav-' + tab) && document.getElementById('nav-' + tab).classList.add('active');
+  if (tab === 'reports') renderReportsTab();
+  if (tab === 'data') renderDataTab();
+}
+
+function renderReportsTab() {
+  const data = getData();
+  const clients = [...(data.clients||[])].sort((a,b) => new Date(b.createdAt)-new Date(a.createdAt));
+
+  document.getElementById('admin-main').innerHTML = `
+    <div class="main-header">
+      <div>
+        <h1>Client reports</h1>
+        <p>Manage all client audit reports and access credentials.</p>
+      </div>
+      <div class="header-actions">
+        <button class="btn-sm dark" onclick="openAddModal()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          Add report
+        </button>
+      </div>
+    </div>
+    <div class="content-body">
+      <div class="stats-row">
+        <div class="stat-card">
+          <div class="stat-label">Total reports</div>
+          <div class="stat-value">${clients.length}</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">This month</div>
+          <div class="stat-value">${clients.filter(c => {
+            const d = new Date(c.createdAt);
+            const now = new Date();
+            return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();
+          }).length}</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">With reports uploaded</div>
+          <div class="stat-value">${clients.filter(c => c.reportHTML && c.reportHTML.length > 20).length}</div>
+        </div>
+      </div>
+      <div class="table-wrap">
+        <div class="table-search">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          <input type="text" placeholder="Search clients…" id="search-input" oninput="filterTable()" autocomplete="off">
+        </div>
+        <table id="clients-table">
+          <thead>
+            <tr>
+              <th>Client</th>
+              <th>Service</th>
+              <th>Audit date</th>
+              <th>Password</th>
+              <th>Added</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="clients-tbody">
+            ${renderTableRows(clients)}
+          </tbody>
+        </table>
+      </div>
+    </div>`;
+}
+
+function renderTableRows(clients) {
+  if (!clients.length) return `<tr class="empty-row"><td colspan="6">No reports yet. Click "Add report" to get started.</td></tr>`;
+  return clients.map(c => {
+    const ci = colorIdx(c.clientName);
+    const hasReport = c.reportHTML && c.reportHTML.length > 20;
+    return `<tr>
+      <td>
+        <div class="client-cell">
+          <div class="client-avatar color-${ci}">${initials(c.clientName)}</div>
+          <div>
+            <div class="client-name">${escHtml(c.clientName)}</div>
+            <div class="client-id">${c.id}</div>
+          </div>
+        </div>
+      </td>
+      <td><span class="badge color-${ci}">${escHtml(c.serviceType)}</span></td>
+      <td>${escHtml(c.auditDate || '—')}</td>
+      <td>
+        <div class="pw-cell">
+          <span class="pw-text">${escHtml(c.password)}</span>
+          <button class="pw-copy" title="Copy password" onclick="copyText('${escHtml(c.password)}','Password copied')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+          </button>
+        </div>
+      </td>
+      <td>${formatDateStr(c.createdAt)}</td>
+      <td>
+        <div class="action-cell">
+          ${hasReport ? `<a class="view-link" href="report.html?id=${c.id}" target="_blank">View</a>` : '<span style="font-size:12px;color:var(--ink3)">No file</span>'}
+          <button class="act-btn" title="Edit" onclick="openEditModal('${c.id}')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+          </button>
+          <button class="act-btn danger" title="Delete" onclick="openDeleteConfirm('${c.id}','${escHtml(c.clientName)}')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4h6v2"/></svg>
+          </button>
+        </div>
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+window.filterTable = function() {
+  const q = document.getElementById('search-input').value.toLowerCase();
+  const data = getData();
+  const clients = [...(data.clients||[])].sort((a,b)=>new Date(b.createdAt)-new Date(a.createdAt));
+  const filtered = q ? clients.filter(c => c.clientName.toLowerCase().includes(q) || c.serviceType.toLowerCase().includes(q)) : clients;
+  document.getElementById('clients-tbody').innerHTML = renderTableRows(filtered);
+};
+
+function renderDataTab() {
+  document.getElementById('admin-main').innerHTML = `
+    <div class="main-header">
+      <div>
+        <h1>Data & backup</h1>
+        <p>Export your data as JSON for backup, or import a previous backup.</p>
+      </div>
+    </div>
+    <div class="content-body">
+      <div class="data-section">
+        <div class="data-section-title">Export data</div>
+        <div class="data-info">Download all client records and report content as a single JSON file. Keep this as a backup — if browser storage is cleared, this is your restore point.</div>
+        <div class="data-actions">
+          <button class="btn-sm" onclick="exportData()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" style="width:14px;height:14px"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            Export as JSON
+          </button>
+        </div>
+      </div>
+      <div class="data-section" style="border-top:1px solid var(--border);padding-top:24px">
+        <div class="data-section-title">Import data</div>
+        <div class="data-info">Restore from a previously exported JSON file. This will <strong>merge</strong> with existing data (no duplicates by ID). It will not delete existing entries.</div>
+        <div class="data-actions">
+          <label class="btn-sm" style="cursor:pointer">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" style="width:14px;height:14px"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+            Import JSON
+            <input type="file" accept=".json" style="display:none" onchange="importData(event)">
+          </label>
+        </div>
+        <div id="import-msg" style="font-size:13px;margin-top:12px;min-height:18px;"></div>
+      </div>
+      <div class="data-section" style="border-top:1px solid var(--border);padding-top:24px">
+        <div class="data-section-title" style="color:var(--red)">Danger zone</div>
+        <div class="data-info">Permanently delete all client data from this browser. This cannot be undone without a backup.</div>
+        <div class="data-actions">
+          <button class="btn-sm" style="color:var(--red);border-color:#f0bbbb" onclick="confirmClearAll()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" style="width:14px;height:14px;stroke:#a32d2d"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/></svg>
+            Clear all data
+          </button>
+        </div>
+      </div>
+    </div>`;
+}
+
+let currentUploadContent = '';
+let editingId = null;
+
+function openAddModal() {
+  editingId = null;
+  currentUploadContent = '';
+  const pw = genPassword();
+  showModal(`
+    <div class="modal-header">
+      <h2>Add new report</h2>
+      <button class="modal-close" onclick="closeModal()">×</button>
+    </div>
+    <div class="field">
+      <label class="field-label">Client name</label>
+      <input type="text" id="m-name" placeholder="e.g. Acme Corp" autocomplete="off">
+    </div>
+    <div class="field">
+      <label class="field-label">Service type</label>
+      <input type="text" id="m-service" placeholder="e.g. SEO Audit, ASO Audit, Web Audit…" autocomplete="off">
+    </div>
+    <div class="field">
+      <label class="field-label">Audit date (DD/MM/YYYY)</label>
+      <input type="date" id="m-date">
+    </div>
+    <div class="field">
+      <label class="field-label">Client password</label>
+      <div class="pw-gen-row">
+        <input type="text" id="m-pw" value="${pw}" autocomplete="off">
+        <button class="pw-gen-btn" onclick="document.getElementById('m-pw').value=genPassword()">Regenerate</button>
+      </div>
+    </div>
+    <div class="field">
+      <label class="field-label">Report HTML file</label>
+      <div class="upload-zone" id="upload-zone">
+        <input type="file" accept=".html,.htm" id="file-input" onchange="handleFileUpload(event)">
+        <div class="upload-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg></div>
+        <div class="upload-text">Click to upload .html file</div>
+        <div class="upload-hint">or drag and drop</div>
+      </div>
+      <div class="upload-success" id="upload-msg"></div>
+    </div>
+    <div class="err-msg" id="modal-err"></div>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeModal()">Cancel</button>
+      <button class="btn-primary" onclick="saveClient()">Save report</button>
+    </div>`);
+  setTimeout(() => document.getElementById('m-name') && document.getElementById('m-name').focus(), 80);
+  setupDragDrop();
+}
+
+function openEditModal(id) {
+  const data = getData();
+  const client = (data.clients||[]).find(c => c.id === id);
+  if (!client) return;
+  editingId = id;
+  currentUploadContent = client.reportHTML || '';
+
+  const hasReport = currentUploadContent && currentUploadContent.length > 20;
+
+  showModal(`
+    <div class="modal-header">
+      <h2>Edit report</h2>
+      <button class="modal-close" onclick="closeModal()">×</button>
+    </div>
+    <div class="field">
+      <label class="field-label">Client name</label>
+      <input type="text" id="m-name" value="${escHtml(client.clientName)}" autocomplete="off">
+    </div>
+    <div class="field">
+      <label class="field-label">Service type</label>
+      <input type="text" id="m-service" value="${escHtml(client.serviceType)}" autocomplete="off">
+    </div>
+    <div class="field">
+      <label class="field-label">Audit date (DD/MM/YYYY)</label>
+      <input type="date" id="m-date" value="${toInputDate(client.auditDate||'')}">
+    </div>
+    <div class="field">
+      <label class="field-label">Client password</label>
+      <div class="pw-gen-row">
+        <input type="text" id="m-pw" value="${escHtml(client.password)}" autocomplete="off">
+        <button class="pw-gen-btn" onclick="document.getElementById('m-pw').value=genPassword()">Regenerate</button>
+      </div>
+    </div>
+    <div class="field">
+      <label class="field-label">Report HTML file</label>
+      <div class="upload-zone" id="upload-zone">
+        <input type="file" accept=".html,.htm" id="file-input" onchange="handleFileUpload(event)">
+        <div class="upload-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg></div>
+        <div class="upload-text">${hasReport ? 'Replace current file' : 'Click to upload .html file'}</div>
+        <div class="upload-hint">${hasReport ? 'A report file is currently uploaded' : 'or drag and drop'}</div>
+      </div>
+      <div class="upload-success" id="upload-msg"></div>
+    </div>
+    <div class="err-msg" id="modal-err"></div>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeModal()">Cancel</button>
+      <button class="btn-primary" onclick="saveClient()">Update report</button>
+    </div>`);
+  setTimeout(() => document.getElementById('m-name') && document.getElementById('m-name').focus(), 80);
+  setupDragDrop();
+}
+
+function setupDragDrop() {
+  const zone = document.getElementById('upload-zone');
+  if (!zone) return;
+  zone.addEventListener('dragover', e => { e.preventDefault(); zone.classList.add('drag'); });
+  zone.addEventListener('dragleave', () => zone.classList.remove('drag'));
+  zone.addEventListener('drop', e => {
+    e.preventDefault();
+    zone.classList.remove('drag');
+    const file = e.dataTransfer.files[0];
+    if (file) readFile(file);
+  });
+}
+
+window.handleFileUpload = function(e) {
+  const file = e.target.files[0];
+  if (file) readFile(file);
+};
+
+function readFile(file) {
+  if (!file.name.match(/\.html?$/i)) {
+    document.getElementById('upload-msg') && (document.getElementById('upload-msg').style.color = 'var(--red)') && (document.getElementById('upload-msg').textContent = 'Please upload a .html file.');
+    return;
+  }
+  const reader = new FileReader();
+  reader.onload = e => {
+    currentUploadContent = e.target.result;
+    const msg = document.getElementById('upload-msg');
+    if (msg) {
+      msg.style.color = 'var(--green)';
+      msg.textContent = `✓ "${file.name}" loaded (${Math.round(file.size/1024)}kb)`;
+    }
+  };
+  reader.readAsText(file);
+}
+
+window.saveClient = function() {
+  const name = (document.getElementById('m-name').value || '').trim();
+  const service = (document.getElementById('m-service').value || '').trim();
+  const pw = (document.getElementById('m-pw').value || '').trim();
+  const dateVal = document.getElementById('m-date').value;
+  const errEl = document.getElementById('modal-err');
+
+  if (!name) { errEl.textContent = 'Client name is required.'; return; }
+  if (!service) { errEl.textContent = 'Service type is required.'; return; }
+  if (!pw) { errEl.textContent = 'Password is required.'; return; }
+
+  const data = getData();
+  const auditDate = dateVal ? fromInputDate(dateVal) : '';
+
+  if (editingId) {
+    const idx = (data.clients||[]).findIndex(c => c.id === editingId);
+    if (idx > -1) {
+      data.clients[idx] = {
+        ...data.clients[idx],
+        clientName: name,
+        serviceType: service,
+        password: pw,
+        auditDate,
+        reportHTML: currentUploadContent || data.clients[idx].reportHTML || ''
+      };
+    }
+    saveData(data);
+    closeModal();
+    renderReportsTab();
+    showToast('Report updated.');
+  } else {
+    const newClient = {
+      id: genId(),
+      clientName: name,
+      serviceType: service,
+      password: pw,
+      auditDate,
+      reportHTML: currentUploadContent || '',
+      createdAt: new Date().toISOString()
+    };
+    if (!data.clients) data.clients = [];
+    data.clients.push(newClient);
+    saveData(data);
+    closeModal();
+    renderReportsTab();
+    showToast('Report added successfully.');
+  }
+};
+
+window.openDeleteConfirm = function(id, name) {
+  const overlay = document.getElementById('confirm-overlay');
+  document.getElementById('confirm-inner').innerHTML = `
+    <h2>Delete report</h2>
+    <p>Are you sure you want to delete the report for <strong>${escHtml(name)}</strong>? This action cannot be undone.</p>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeConfirm()">Cancel</button>
+      <button class="btn-danger" onclick="deleteClient('${id}')">Delete</button>
+    </div>`;
+  overlay.classList.add('open');
+};
+
+window.deleteClient = function(id) {
+  const data = getData();
+  data.clients = (data.clients||[]).filter(c => c.id !== id);
+  saveData(data);
+  closeConfirm();
+  renderReportsTab();
+  showToast('Report deleted.');
+};
+
+function confirmClearAll() {
+  const overlay = document.getElementById('confirm-overlay');
+  document.getElementById('confirm-inner').innerHTML = `
+    <h2>Clear all data?</h2>
+    <p>This will permanently delete all client reports and credentials from this browser. Export a backup first if you need it.</p>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeConfirm()">Cancel</button>
+      <button class="btn-danger" onclick="clearAll()">Yes, clear everything</button>
+    </div>`;
+  overlay.classList.add('open');
+}
+
+window.clearAll = function() {
+  localStorage.removeItem('tresify_data');
+  closeConfirm();
+  renderReportsTab();
+  showToast('All data cleared.');
+};
+
+function showModal(html) {
+  document.getElementById('modal-inner').innerHTML = html;
+  document.getElementById('modal-overlay').classList.add('open');
+}
+
+function closeModal() {
+  document.getElementById('modal-overlay').classList.remove('open');
+  currentUploadContent = '';
+  editingId = null;
+}
+
+function closeConfirm() {
+  document.getElementById('confirm-overlay').classList.remove('open');
+}
+
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') { closeModal(); closeConfirm(); }
+});
+
+window.copyText = function(text, msg) {
+  navigator.clipboard.writeText(text).catch(()=>{});
+  showToast(msg || 'Copied!');
+};
+
+window.exportData = function() {
+  const data = getData();
+  const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `tresifylab-backup-${new Date().toISOString().slice(0,10)}.json`;
+  a.click();
+  URL.revokeObjectURL(url);
+  showToast('Data exported.');
+};
+
+window.importData = function(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = ev => {
+    try {
+      const imported = JSON.parse(ev.target.result);
+      if (!imported.clients || !Array.isArray(imported.clients)) throw new Error('Invalid format');
+      const existing = getData();
+      const existingIds = new Set((existing.clients||[]).map(c=>c.id));
+      let added = 0;
+      imported.clients.forEach(c => {
+        if (!existingIds.has(c.id)) {
+          existing.clients.push(c);
+          added++;
+        }
+      });
+      saveData(existing);
+      document.getElementById('import-msg').style.color = 'var(--green)';
+      document.getElementById('import-msg').textContent = `✓ Imported ${added} new record(s). ${imported.clients.length - added} duplicate(s) skipped.`;
+      if (document.getElementById('clients-tbody')) renderReportsTab();
+    } catch(err) {
+      document.getElementById('import-msg').style.color = 'var(--red)';
+      document.getElementById('import-msg').textContent = 'Invalid JSON file. Please use a valid Tresify Lab export.';
+    }
+  };
+  reader.readAsText(file);
+};
+
+function logout() {
+  sessionStorage.removeItem('tresify_admin');
+  renderLogin();
+}
+
+window.genPassword = genPassword;
+window.switchTab = switchTab;
+window.logout = logout;
+window.openAddModal = openAddModal;
+window.openEditModal = openEditModal;
+window.openDeleteConfirm = openDeleteConfirm;
+window.confirmClearAll = confirmClearAll;
+window.exportData = exportData;
+window.importData = importData;
+window.clearAll = clearAll;
+window.copyText = copyText;
+window.closeModal = closeModal;
+window.closeConfirm = closeConfirm;
+window.saveClient = saveClient;
+window.deleteClient = deleteClient;
+window.filterTable = filterTable;
+window.handleFileUpload = handleFileUpload;
+</script>
+</body>
+</html>

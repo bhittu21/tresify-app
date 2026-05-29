@@ -1,0 +1,627 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<title>Tresify Lab — Audit Reports</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500&family=DM+Serif+Display&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --ink: #0f0f0f;
+    --ink2: #555;
+    --ink3: #999;
+    --surface: #fafaf8;
+    --card: #ffffff;
+    --border: #e8e8e4;
+    --accent: #1a1a1a;
+    --accent-light: #f0ede8;
+    --teal: #0f6e56;
+    --teal-bg: #e1f5ee;
+    --blue: #185fa5;
+    --blue-bg: #e6f1fb;
+    --amber: #854f0b;
+    --amber-bg: #faeeda;
+    --purple: #534ab7;
+    --purple-bg: #eeedfe;
+    --coral: #993c1d;
+    --coral-bg: #faece7;
+  }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--surface);
+    color: var(--ink);
+    min-height: 100vh;
+  }
+
+  header {
+    background: var(--card);
+    border-bottom: 1px solid var(--border);
+    padding: 0 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 64px;
+  }
+
+  .logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    text-decoration: none;
+  }
+
+  .logo-mark {
+    width: 32px;
+    height: 32px;
+    background: var(--ink);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .logo-mark svg { width: 18px; height: 18px; }
+
+  .logo-text {
+    font-family: 'DM Serif Display', serif;
+    font-size: 18px;
+    color: var(--ink);
+    letter-spacing: -0.3px;
+  }
+
+  .logo-sub {
+    font-size: 11px;
+    color: var(--ink3);
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    margin-top: 1px;
+  }
+
+  .header-right {
+    font-size: 13px;
+    color: var(--ink3);
+  }
+
+  .hero {
+    max-width: 860px;
+    margin: 0 auto;
+    padding: 64px 2rem 40px;
+  }
+
+  .hero-label {
+    font-size: 11px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--ink3);
+    margin-bottom: 16px;
+  }
+
+  .hero h1 {
+    font-family: 'DM Serif Display', serif;
+    font-size: 42px;
+    line-height: 1.15;
+    letter-spacing: -1px;
+    color: var(--ink);
+    margin-bottom: 14px;
+  }
+
+  .hero p {
+    font-size: 16px;
+    color: var(--ink2);
+    line-height: 1.65;
+    max-width: 520px;
+  }
+
+  .divider {
+    max-width: 860px;
+    margin: 0 auto;
+    padding: 0 2rem;
+    border-top: 1px solid var(--border);
+  }
+
+  .reports-section {
+    max-width: 860px;
+    margin: 0 auto;
+    padding: 40px 2rem 80px;
+  }
+
+  .section-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 24px;
+  }
+
+  .section-title {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--ink2);
+    letter-spacing: 0.3px;
+  }
+
+  .report-count {
+    font-size: 13px;
+    color: var(--ink3);
+  }
+
+  .empty-state {
+    text-align: center;
+    padding: 80px 0;
+    color: var(--ink3);
+  }
+
+  .empty-state svg {
+    width: 48px;
+    height: 48px;
+    margin: 0 auto 16px;
+    display: block;
+    opacity: 0.3;
+  }
+
+  .empty-state p {
+    font-size: 15px;
+  }
+
+  .cards-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 16px;
+  }
+
+  .report-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 24px;
+    cursor: pointer;
+    transition: border-color 0.15s, transform 0.15s;
+    text-decoration: none;
+    display: block;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .report-card:hover {
+    border-color: #ccc;
+    transform: translateY(-2px);
+  }
+
+  .report-card:active { transform: translateY(0); }
+
+  .card-top {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    margin-bottom: 20px;
+  }
+
+  .client-initials {
+    width: 44px;
+    height: 44px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 15px;
+    font-weight: 500;
+    flex-shrink: 0;
+  }
+
+  .lock-icon {
+    width: 28px;
+    height: 28px;
+    background: #f5f5f3;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .lock-icon svg { width: 14px; height: 14px; opacity: 0.4; }
+
+  .card-name {
+    font-size: 16px;
+    font-weight: 500;
+    color: var(--ink);
+    margin-bottom: 6px;
+    line-height: 1.3;
+  }
+
+  .card-service {
+    font-size: 13px;
+    color: var(--ink2);
+    margin-bottom: 16px;
+  }
+
+  .card-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-top: 16px;
+    border-top: 1px solid var(--border);
+  }
+
+  .card-date {
+    font-size: 12px;
+    color: var(--ink3);
+  }
+
+  .card-badge {
+    font-size: 11px;
+    font-weight: 500;
+    padding: 4px 10px;
+    border-radius: 20px;
+    letter-spacing: 0.2px;
+  }
+
+  .modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.45);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 100;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s;
+  }
+
+  .modal-overlay.open {
+    opacity: 1;
+    pointer-events: all;
+  }
+
+  .modal {
+    background: var(--card);
+    border-radius: 16px;
+    padding: 32px;
+    width: 100%;
+    max-width: 380px;
+    margin: 1rem;
+    transform: translateY(8px);
+    transition: transform 0.2s;
+  }
+
+  .modal-overlay.open .modal { transform: translateY(0); }
+
+  .modal-logo {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 24px;
+  }
+
+  .modal-logo-mark {
+    width: 26px;
+    height: 26px;
+    background: var(--ink);
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .modal-logo-mark svg { width: 14px; height: 14px; }
+
+  .modal-logo-text {
+    font-family: 'DM Serif Display', serif;
+    font-size: 15px;
+    color: var(--ink);
+  }
+
+  .modal h2 {
+    font-size: 20px;
+    font-weight: 500;
+    margin-bottom: 6px;
+    letter-spacing: -0.3px;
+  }
+
+  .modal-sub {
+    font-size: 14px;
+    color: var(--ink2);
+    margin-bottom: 24px;
+    line-height: 1.5;
+  }
+
+  .modal label {
+    display: block;
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--ink2);
+    margin-bottom: 8px;
+    letter-spacing: 0.3px;
+    text-transform: uppercase;
+  }
+
+  .modal input {
+    width: 100%;
+    padding: 12px 14px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 15px;
+    color: var(--ink);
+    background: var(--surface);
+    outline: none;
+    transition: border-color 0.15s;
+  }
+
+  .modal input:focus { border-color: var(--ink); }
+
+  .modal-error {
+    font-size: 13px;
+    color: #c0392b;
+    margin-top: 8px;
+    min-height: 18px;
+  }
+
+  .modal-btn {
+    width: 100%;
+    padding: 13px;
+    background: var(--ink);
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 15px;
+    font-weight: 500;
+    cursor: pointer;
+    margin-top: 20px;
+    transition: background 0.15s;
+  }
+
+  .modal-btn:hover { background: #333; }
+
+  .modal-cancel {
+    width: 100%;
+    padding: 11px;
+    background: transparent;
+    color: var(--ink2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    cursor: pointer;
+    margin-top: 8px;
+    transition: background 0.15s;
+  }
+
+  .modal-cancel:hover { background: var(--surface); }
+
+  footer {
+    border-top: 1px solid var(--border);
+    padding: 24px 2rem;
+    text-align: center;
+    font-size: 12px;
+    color: var(--ink3);
+  }
+
+  .color-0 { background: var(--teal-bg); color: var(--teal); }
+  .color-1 { background: var(--blue-bg); color: var(--blue); }
+  .color-2 { background: var(--purple-bg); color: var(--purple); }
+  .color-3 { background: var(--coral-bg); color: var(--coral); }
+  .color-4 { background: var(--amber-bg); color: var(--amber); }
+
+  .badge-0 { background: var(--teal-bg); color: var(--teal); }
+  .badge-1 { background: var(--blue-bg); color: var(--blue); }
+  .badge-2 { background: var(--purple-bg); color: var(--purple); }
+  .badge-3 { background: var(--coral-bg); color: var(--coral); }
+  .badge-4 { background: var(--amber-bg); color: var(--amber); }
+</style>
+</head>
+<body>
+
+<header>
+  <a class="logo" href="index.html">
+    <div class="logo-mark">
+      <svg viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <rect x="2" y="2" width="6" height="6" rx="1.5" fill="white"/>
+        <rect x="10" y="2" width="6" height="6" rx="1.5" fill="white" opacity="0.6"/>
+        <rect x="2" y="10" width="6" height="6" rx="1.5" fill="white" opacity="0.6"/>
+        <rect x="10" y="10" width="6" height="6" rx="1.5" fill="white" opacity="0.3"/>
+      </svg>
+    </div>
+    <div>
+      <div class="logo-text">Tresify Lab</div>
+      <div class="logo-sub">Reports Portal</div>
+    </div>
+  </a>
+  <div class="header-right">Secure client reports</div>
+</header>
+
+<div class="hero">
+  <div class="hero-label">Audit Reports</div>
+  <h1>Your detailed<br>audit is ready.</h1>
+  <p>Select your company below to access your confidential audit report. You'll need your access password to view the full report.</p>
+</div>
+
+<div class="divider"></div>
+
+<div class="reports-section">
+  <div class="section-header">
+    <div class="section-title">All reports</div>
+    <div class="report-count" id="report-count">—</div>
+  </div>
+
+  <div id="cards-container">
+    <div class="empty-state">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+        <path d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+      </svg>
+      <p>No reports published yet.</p>
+    </div>
+  </div>
+</div>
+
+<footer>
+  &copy; <span id="yr"></span> Tresify Lab. All reports are confidential and password-protected.
+</footer>
+
+<div class="modal-overlay" id="modal-overlay">
+  <div class="modal">
+    <div class="modal-logo">
+      <div class="modal-logo-mark">
+        <svg viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect x="2" y="2" width="6" height="6" rx="1.5" fill="white"/>
+          <rect x="10" y="2" width="6" height="6" rx="1.5" fill="white" opacity="0.6"/>
+          <rect x="2" y="10" width="6" height="6" rx="1.5" fill="white" opacity="0.6"/>
+          <rect x="10" y="10" width="6" height="6" rx="1.5" fill="white" opacity="0.3"/>
+        </svg>
+      </div>
+      <span class="modal-logo-text">Tresify Lab</span>
+    </div>
+    <h2 id="modal-title">Access report</h2>
+    <p class="modal-sub" id="modal-sub">Enter the password provided to you to view this report.</p>
+    <label for="pw-input">Password</label>
+    <input type="password" id="pw-input" placeholder="Enter your password" autocomplete="off">
+    <div class="modal-error" id="modal-error"></div>
+    <button class="modal-btn" id="modal-confirm">View report →</button>
+    <button class="modal-cancel" id="modal-cancel">Cancel</button>
+  </div>
+</div>
+
+<script>
+document.getElementById('yr').textContent = new Date().getFullYear();
+let sharedData = { clients: [] };
+
+function readLocalData() {
+  try { return JSON.parse(localStorage.getItem('tresify_data') || '{"clients":[]}'); }
+  catch { return { clients: [] }; }
+}
+
+async function loadData() {
+  sharedData = readLocalData();
+  if (location.protocol === 'file:') return;
+  try {
+    const res = await fetch('api/data', { cache: 'no-store' });
+    if (!res.ok) throw new Error('Shared data unavailable');
+    const data = await res.json();
+    if (!Array.isArray(data.clients)) throw new Error('Invalid shared data');
+    sharedData = data;
+    try { localStorage.setItem('tresify_data', JSON.stringify(data)); } catch(e) {}
+  } catch(e) {}
+}
+
+function getData() {
+  return sharedData;
+}
+
+const colorIdx = name => {
+  let h = 0;
+  for (let c of name) h = (h * 31 + c.charCodeAt(0)) & 0xffffffff;
+  return Math.abs(h) % 5;
+};
+
+const initials = name => name.trim().split(/\s+/).map(w => w[0].toUpperCase()).slice(0,2).join('');
+
+function render() {
+  const data = getData();
+  const clients = [...(data.clients || [])].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+  const container = document.getElementById('cards-container');
+  const countEl = document.getElementById('report-count');
+
+  if (!clients.length) {
+    countEl.textContent = '0 reports';
+    container.innerHTML = `<div class="empty-state">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+        <path d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+      </svg>
+      <p>No reports published yet.</p>
+    </div>`;
+    return;
+  }
+
+  countEl.textContent = clients.length + (clients.length === 1 ? ' report' : ' reports');
+  const grid = document.createElement('div');
+  grid.className = 'cards-grid';
+
+  clients.forEach(client => {
+    const ci = colorIdx(client.clientName);
+    const card = document.createElement('a');
+    card.className = 'report-card';
+    card.href = '#';
+    card.dataset.id = client.id;
+    card.innerHTML = `
+      <div class="card-top">
+        <div class="client-initials color-${ci}">${initials(client.clientName)}</div>
+        <div class="lock-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+            <path d="M7 11V7a5 5 0 0110 0v4"/>
+          </svg>
+        </div>
+      </div>
+      <div class="card-name">${escHtml(client.clientName)}</div>
+      <div class="card-service">${escHtml(client.serviceType)}</div>
+      <div class="card-footer">
+        <div class="card-date">Audited ${escHtml(client.auditDate || formatDate(client.createdAt))}</div>
+        <div class="card-badge badge-${ci}">${escHtml(client.serviceType.split(' ')[0])}</div>
+      </div>`;
+    card.addEventListener('click', e => { e.preventDefault(); openModal(client); });
+    grid.appendChild(card);
+  });
+
+  container.innerHTML = '';
+  container.appendChild(grid);
+}
+
+function formatDate(iso) {
+  if (!iso) return '';
+  const d = new Date(iso);
+  return d.toLocaleDateString('en-GB');
+}
+
+function escHtml(s) {
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+let activeClient = null;
+
+function openModal(client) {
+  activeClient = client;
+  document.getElementById('modal-title').textContent = client.clientName;
+  document.getElementById('modal-sub').textContent = `Enter your password to view the ${client.serviceType} report.`;
+  document.getElementById('pw-input').value = '';
+  document.getElementById('modal-error').textContent = '';
+  document.getElementById('modal-overlay').classList.add('open');
+  setTimeout(() => document.getElementById('pw-input').focus(), 100);
+}
+
+function closeModal() {
+  document.getElementById('modal-overlay').classList.remove('open');
+  activeClient = null;
+}
+
+document.getElementById('modal-cancel').addEventListener('click', closeModal);
+document.getElementById('modal-overlay').addEventListener('click', e => {
+  if (e.target === document.getElementById('modal-overlay')) closeModal();
+});
+
+document.getElementById('modal-confirm').addEventListener('click', () => {
+  const entered = document.getElementById('pw-input').value.trim();
+  if (!activeClient) return;
+  if (entered === activeClient.password) {
+    sessionStorage.setItem('tresify_auth_' + activeClient.id, '1');
+    window.location.href = 'report.html?id=' + encodeURIComponent(activeClient.id);
+  } else {
+    document.getElementById('modal-error').textContent = 'Incorrect password. Please try again.';
+    document.getElementById('pw-input').focus();
+  }
+});
+
+document.getElementById('pw-input').addEventListener('keydown', e => {
+  if (e.key === 'Enter') document.getElementById('modal-confirm').click();
+});
+
+loadData().then(render);
+</script>
+</body>
+</html>

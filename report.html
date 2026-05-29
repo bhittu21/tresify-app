@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<title>Audit Report — Tresify Lab</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500&family=DM+Serif+Display&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --ink: #0f0f0f;
+    --ink2: #555;
+    --ink3: #999;
+    --surface: #fafaf8;
+    --card: #ffffff;
+    --border: #e8e8e4;
+    --accent: #1a1a1a;
+  }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--surface);
+    color: var(--ink);
+    min-height: 100vh;
+  }
+
+  .topbar {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    background: var(--card);
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 1.5rem;
+    height: 56px;
+    gap: 16px;
+  }
+
+  .topbar-left {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-width: 0;
+  }
+
+  .logo-mark {
+    width: 28px;
+    height: 28px;
+    background: var(--ink);
+    border-radius: 7px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .logo-mark svg { width: 16px; height: 16px; }
+
+  .logo-divider {
+    width: 1px;
+    height: 20px;
+    background: var(--border);
+  }
+
+  .report-meta { min-width: 0; }
+
+  .report-title {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--ink);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .report-info {
+    font-size: 12px;
+    color: var(--ink3);
+    margin-top: 1px;
+  }
+
+  .topbar-right {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-shrink: 0;
+  }
+
+  .btn-icon {
+    width: 34px;
+    height: 34px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: transparent;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.15s;
+  }
+
+  .btn-icon:hover { background: var(--surface); }
+  .btn-icon svg { width: 16px; height: 16px; stroke: var(--ink2); }
+
+  .btn-text {
+    height: 34px;
+    padding: 0 14px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: transparent;
+    cursor: pointer;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    color: var(--ink2);
+    transition: background 0.15s;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .btn-text:hover { background: var(--surface); }
+
+  .copy-toast {
+    position: fixed;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%) translateY(10px);
+    background: var(--ink);
+    color: #fff;
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-size: 13px;
+    opacity: 0;
+    transition: opacity 0.2s, transform 0.2s;
+    pointer-events: none;
+    z-index: 200;
+  }
+
+  .copy-toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+  .layout {
+    display: flex;
+    height: calc(100vh - 56px);
+    overflow: hidden;
+  }
+
+  .main-content {
+    flex: 1;
+    overflow: hidden;
+    background: #fff;
+    padding: 0;
+  }
+
+  .report-paper {
+    width: 100%;
+    background: transparent;
+    border: none;
+    border-radius: 0;
+    overflow: hidden;
+    height: 100%;
+  }
+
+  .report-paper iframe {
+    width: 100%;
+    height: 100%;
+    border: none;
+    display: block;
+  }
+
+  .pw-gate {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--surface);
+    padding: 2rem;
+  }
+
+  .pw-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 40px;
+    width: 100%;
+    max-width: 380px;
+  }
+
+  .pw-logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 28px;
+  }
+
+  .pw-logo-mark {
+    width: 30px;
+    height: 30px;
+    background: var(--ink);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .pw-logo-mark svg { width: 17px; height: 17px; }
+
+  .pw-logo-text {
+    font-family: 'DM Serif Display', serif;
+    font-size: 16px;
+    color: var(--ink);
+  }
+
+  .pw-card h1 {
+    font-size: 22px;
+    font-weight: 500;
+    letter-spacing: -0.3px;
+    margin-bottom: 8px;
+  }
+
+  .pw-card p {
+    font-size: 14px;
+    color: var(--ink2);
+    line-height: 1.6;
+    margin-bottom: 28px;
+  }
+
+  .pw-label {
+    display: block;
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    color: var(--ink2);
+    margin-bottom: 8px;
+  }
+
+  .pw-input {
+    width: 100%;
+    padding: 12px 14px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 15px;
+    color: var(--ink);
+    background: var(--surface);
+    outline: none;
+    transition: border-color 0.15s;
+  }
+
+  .pw-input:focus { border-color: var(--ink); }
+
+  .pw-error {
+    font-size: 13px;
+    color: #c0392b;
+    margin-top: 8px;
+    min-height: 18px;
+  }
+
+  .pw-btn {
+    width: 100%;
+    padding: 13px;
+    background: var(--ink);
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 15px;
+    font-weight: 500;
+    cursor: pointer;
+    margin-top: 20px;
+    transition: background 0.15s;
+  }
+
+  .pw-btn:hover { background: #333; }
+
+  .back-link {
+    display: block;
+    text-align: center;
+    margin-top: 16px;
+    font-size: 13px;
+    color: var(--ink3);
+    text-decoration: none;
+  }
+
+  .back-link:hover { color: var(--ink); }
+
+  .not-found {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    gap: 16px;
+    color: var(--ink3);
+    font-size: 15px;
+  }
+
+  @media (max-width: 640px) {
+    .btn-text span { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<div id="app"></div>
+<div class="copy-toast" id="copy-toast">Link copied to clipboard</div>
+
+<script>
+let sharedData = { clients: [] };
+
+function readLocalData() {
+  try { return JSON.parse(localStorage.getItem('tresify_data') || '{"clients":[]}'); }
+  catch { return { clients: [] }; }
+}
+
+async function loadData() {
+  sharedData = readLocalData();
+  if (location.protocol === 'file:') return;
+  try {
+    const res = await fetch('api/data', { cache: 'no-store' });
+    if (!res.ok) throw new Error('Shared data unavailable');
+    const data = await res.json();
+    if (!Array.isArray(data.clients)) throw new Error('Invalid shared data');
+    sharedData = data;
+    try { localStorage.setItem('tresify_data', JSON.stringify(data)); } catch(e) {}
+  } catch(e) {}
+}
+
+function getData() {
+  return sharedData;
+}
+
+function escHtml(s) {
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+const params = new URLSearchParams(location.search);
+const clientId = params.get('id');
+const app = document.getElementById('app');
+
+function initReport() {
+if (!clientId) {
+  app.innerHTML = `<div class="not-found"><p>No report specified.</p><a href="index.html" style="color:var(--ink2);font-size:13px">← Back to reports</a></div>`;
+  document.title = 'Not found — Tresify Lab';
+} else {
+  const data = getData();
+  const client = (data.clients || []).find(c => c.id === clientId);
+
+  if (!client) {
+    app.innerHTML = `<div class="not-found"><p>Report not found.</p><a href="index.html" style="color:var(--ink2);font-size:13px">← Back to reports</a></div>`;
+    document.title = 'Not found — Tresify Lab';
+  } else {
+    const isAuthed = sessionStorage.getItem('tresify_auth_' + clientId) === '1';
+    if (!isAuthed) {
+      showPasswordGate(client);
+    } else {
+      showReport(client);
+    }
+  }
+}
+}
+
+loadData().then(initReport);
+
+function showPasswordGate(client) {
+  document.title = `${client.clientName} Report — Tresify Lab`;
+  app.innerHTML = `
+    <div class="pw-gate">
+      <div class="pw-card">
+        <div class="pw-logo">
+          <div class="pw-logo-mark">
+            <svg viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <rect x="2" y="2" width="6" height="6" rx="1.5" fill="white"/>
+              <rect x="10" y="2" width="6" height="6" rx="1.5" fill="white" opacity="0.6"/>
+              <rect x="2" y="10" width="6" height="6" rx="1.5" fill="white" opacity="0.6"/>
+              <rect x="10" y="10" width="6" height="6" rx="1.5" fill="white" opacity="0.3"/>
+            </svg>
+          </div>
+          <span class="pw-logo-text">Tresify Lab</span>
+        </div>
+        <h1>${escHtml(client.clientName)}</h1>
+        <p>${escHtml(client.serviceType)} audit report. Enter your password to view the full report.</p>
+        <label class="pw-label" for="pw">Password</label>
+        <input class="pw-input" type="password" id="pw" placeholder="Enter your password" autocomplete="off">
+        <div class="pw-error" id="pw-err"></div>
+        <button class="pw-btn" id="pw-btn">View report →</button>
+        <a class="back-link" href="index.html">← Back to all reports</a>
+      </div>
+    </div>`;
+
+  const check = () => {
+    const val = document.getElementById('pw').value.trim();
+    if (val === client.password) {
+      sessionStorage.setItem('tresify_auth_' + client.id, '1');
+      showReport(client);
+    } else {
+      document.getElementById('pw-err').textContent = 'Incorrect password. Please try again.';
+      document.getElementById('pw').focus();
+    }
+  };
+
+  document.getElementById('pw-btn').addEventListener('click', check);
+  document.getElementById('pw').addEventListener('keydown', e => { if (e.key === 'Enter') check(); });
+  setTimeout(() => document.getElementById('pw') && document.getElementById('pw').focus(), 100);
+}
+
+function showReport(client) {
+  document.title = `${client.clientName} — ${client.serviceType} Report`;
+
+  const auditDate = client.auditDate || formatDate(client.createdAt);
+
+  app.innerHTML = `
+    <div class="topbar">
+      <div class="topbar-left">
+        <a href="index.html" style="text-decoration:none">
+          <div class="logo-mark">
+            <svg viewBox="0 0 18 18" fill="none">
+              <rect x="2" y="2" width="6" height="6" rx="1.5" fill="white"/>
+              <rect x="10" y="2" width="6" height="6" rx="1.5" fill="white" opacity="0.6"/>
+              <rect x="2" y="10" width="6" height="6" rx="1.5" fill="white" opacity="0.6"/>
+              <rect x="10" y="10" width="6" height="6" rx="1.5" fill="white" opacity="0.3"/>
+            </svg>
+          </div>
+        </a>
+        <div class="logo-divider"></div>
+        <div class="report-meta">
+          <div class="report-title">${escHtml(client.clientName)} — ${escHtml(client.serviceType)}</div>
+          <div class="report-info">Audited ${auditDate}</div>
+        </div>
+      </div>
+      <div class="topbar-right">
+        <button class="btn-text" id="share-btn" title="Copy link">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" style="width:14px;height:14px">
+            <path d="M4 12v8a2 2 0 002 2h12a2 2 0 002-2v-8M16 6l-4-4-4 4M12 2v13"/>
+          </svg>
+          <span>Share</span>
+        </button>
+        <button class="btn-icon" id="print-btn" title="Print report">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+            <polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2"/>
+            <rect x="6" y="14" width="12" height="8"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+    <div class="layout">
+      <div class="main-content">
+        <div class="report-paper">
+          <iframe id="report-frame" title="Audit report"></iframe>
+        </div>
+      </div>
+    </div>`;
+
+  const frame = document.getElementById('report-frame');
+  frame.srcdoc = client.reportHTML || '<p style="padding:2rem;font-family:sans-serif;color:#888">No report content uploaded yet.</p>';
+
+  document.getElementById('share-btn').addEventListener('click', () => {
+    const url = window.location.href;
+    navigator.clipboard.writeText(url).catch(() => {});
+    const t = document.getElementById('copy-toast');
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 2500);
+  });
+
+  document.getElementById('print-btn').addEventListener('click', () => {
+    frame.contentWindow && frame.contentWindow.print();
+  });
+}
+
+function formatDate(iso) {
+  if (!iso) return '—';
+  const d = new Date(iso);
+  const dd = String(d.getDate()).padStart(2,'0');
+  const mm = String(d.getMonth()+1).padStart(2,'0');
+  const yyyy = d.getFullYear();
+  return `${dd}/${mm}/${yyyy}`;
+}
+</script>
+</body>
+</html>
